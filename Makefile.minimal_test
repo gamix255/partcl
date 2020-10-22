@@ -1,0 +1,37 @@
+CC ?= gcc
+CFLAGS ?= -Os -Wall -Wextra -std=c99 -pedantic
+LDFLAGS ?= -Os
+
+TCLBIN := tcl
+
+TEST_CC := gcc
+TEST_CFLAGS := -O0 -g -std=c99 -pedantic -fprofile-arcs -ftest-coverage
+TEST_LDFLAGS := $(TEST_CFLAGS)
+#TCLTESTBIN := tcl_test
+TCLTESTBIN := my_tcl_test01
+
+all: test
+tcl: tcl.o
+
+test: $(TCLTESTBIN)
+	./my_tcl_test01
+#	llvm-cov -gcda=tcl_test.gcda -gcno=tcl_test.gcno | grep "#####:"
+$(TCLTESTBIN): my_tcl_test.o
+	$(TEST_CC) $(TEST_LDFLAGS) -o $@ $^
+my_tcl_test.o: mytcl01.c tcl.c 
+	$(TEST_CC) $(TEST_CFLAGS) -c mytcl01.c -o $@
+
+#fmt:
+#	clang-format-3.6 -i *.c *.h
+#	cloc tcl.c
+
+clean:
+	rm -f $(TCLBIN) $(TCLTESTBIN) *.o *.gcda *.gcno
+
+.PHONY: test clean fmt
+
+
+#my_tcl_test.o: mytcl01.c tcl.c \
+#	tcl_test_lexer.h tcl_test_subst.h tcl_test_flow.h tcl_test_math.h
+#	$(TEST_CC) $(TEST_CFLAGS) -c tcl_test.c -o $@
+
